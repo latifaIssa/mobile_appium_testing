@@ -1,25 +1,28 @@
+import requests
+
 from appium import webdriver
 from selenium.webdriver.common.by import By
 # # pip install eyes-selenium to install the sdk
-# from applitools.selenium.eyes import Eyes
+from applitools.selenium.eyes import Eyes
 
 # Desired capabilities
 desired_caps = {
     "platformName": "Android",
     "platformVersion": "11.0",
-    # Write adb devices in bash to show the device name
-    "deviceName": "OPPO A9 2020",
-    "browserName": "Chrome",
-    'automationName': 'UIAutomator2',
+    # Write adb devices in bash to show the device name: 5c2f76be
+    'deviceName': '5c2f76be',
+    "browserName": "chrome",
+    # 'automationName': 'UIAutomator2',
     "autoGrantPermissions": "true",
     'autoAcceptAlerts': 'true',
     'goog:chromeOptions': {
-        'w3c': False
+        'w3c': True
     }
 
-    # This command line for app tesitng
+    # This command line for app testing
     # to find out app package: adb shell dumpsys window | find "mCurrentFocus"
 }
+
 
 class FirstTest:
     # Create driver instance
@@ -38,27 +41,22 @@ class FirstTest:
     driver.find_element(By.XPATH, '//a[@href="/add_remove_elements/" and (text()="Add/Remove Elements")]').click()
     driver.implicitly_wait(10)
     driver.find_element(By.TAG_NAME, 'button').click()
-    driver.implicitly_wait(10)
-    driver.find_element(By.CLASS_NAME, 'added-manually').click()
+    driver.implicitly_wait(20)
+    driver.find_element(By.CSS_SELECTOR, '#elements > button').click()
     driver.implicitly_wait(10)
     driver.back()
 
     # find broken images
-    images = driver.find_elements(By.TAG_NAME, 'img')
+    driver.find_element(By.XPATH, '//a[@href="/broken_images" and (text()="Broken Images")]').click()
+    driver.implicitly_wait(10)
+    images = driver.find_elements(By.XPATH, '//div[@class="example"]/img')
     for i in images:
-        if(i != ''):
-            assert i.get_attribute('natural_size') == '0'
+        r = i.size['width']
+        s = i.get_attribute('src')
+        # if i != '':
+        #     assert r != '0'
+        req = requests.get('https://the-internet.herokuapp.com/'+s)
+        if req.status_code != 200:
+            print(f"this image {i} is broken")
 
     driver.back()
-
-
-
-
-
-
-
-
-
-
-
-
